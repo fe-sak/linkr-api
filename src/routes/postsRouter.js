@@ -1,10 +1,13 @@
 import { Router } from "express";
-import { postPosts } from "../controllers/postsController.js";
+import { postPosts, readPosts } from "../controllers/postsController.js";
 import { validateSchemaMiddleware } from "../middlewares/validateSchemaMiddleware.js";
 import postSchema from "../schemas/postSchema.js";
+import { auth } from '../middlewares/authMiddleware.js';
 
-const postRouter = Router();
+const postsRouter = Router();
 
-postRouter.post('/posts', validateSchemaMiddleware(postSchema), postPosts); //missing token
+postsRouter.get('/posts', auth, readPosts);
 
-export default postRouter;
+postsRouter.post('/posts', validateSchemaMiddleware(postSchema), postPosts); //missing token
+
+export default postsRouter;

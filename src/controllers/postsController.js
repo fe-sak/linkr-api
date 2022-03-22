@@ -1,5 +1,6 @@
 import connection from "../database.js";
 import printError from "../utils/printError.js";
+import * as postsRepository from '../repositories/postsRepository.js';
 
 export async function postPosts(req, res) {
     try {
@@ -39,4 +40,13 @@ export async function postPosts(req, res) {
     } catch (error) {
         printError(res, error)
     }
+}
+
+export async function readPosts(req, res, next) {
+  try {
+    const posts = await postsRepository.read();
+    return res.send(posts);
+  } catch (error) {
+    next(error);
+  }
 }
