@@ -35,8 +35,34 @@ async function findUsername({ username }) {
     return user.rows[0];
 }
 
+async function deleteSession({ userId }) {
+    await connection.query(`
+        DELETE FROM sessions
+        WHERE user_id = $1
+    `, [userId]);
+
+    return true;
+}
+
+async function loginUser({
+    token,
+    userId,
+}) {
+    const session = await connection.query(`
+        INSERT INTO sessions
+            (token, user_id)
+        VALUES
+            ($1, $2)
+        RETURNING *;
+    `, [token, userId]);
+
+    return session.rows[0];
+}
+
 export {
     create,
     findEmail,
     findUsername,
+    deleteSession,
+    loginUser,
 }
