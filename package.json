@@ -2,7 +2,7 @@
   "name": "linkr-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/app.js",
   "type": "module",
   "scripts": {
     "dev": "fuser -k 4000/tcp ; npx nodemon ./src/app.js",
