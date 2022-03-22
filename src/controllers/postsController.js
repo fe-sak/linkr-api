@@ -1,9 +1,40 @@
 import connection from "../database.js";
 import printError from "../utils/printError.js";
 
-export async function postPosts(req, res, next) {
+export async function postPosts(req, res) {
     try {
-        console.log(req.body);
+        //req.locals.userToken = id
+        const id = 1
+        const comment =  req.body.comment || null
+        const postId = await connection.query(`
+        INSERT INTO posts (comment, user_id, link)
+        VALUES ($1, ${id}, $2)
+        RETURNING id`, [comment, req.body.link])
+
+        if (comment){
+            const arr = comment.split(' ')
+            const tags = arr.filter(v => v[0]==='#')
+            tags.map(async v => {
+                const {rowCount, rows} = await connection.query(`
+                SELECT id FROM hashtags
+                WHERE name=$1`,[v])
+
+                if(rowCount > 0){
+                    await connection.query(`
+                    INSERT INTO hashtags_posts (hashtag_id, post_id)
+                    VALUES ($1, $2)`, [rows[0].id, postId.rows[0].id])
+                }else{
+                    const hashId = await connection.query(`
+                    INSERT INTO hashtags (name)
+                    VALUES ($1)
+                    RETURNING id`, [v])
+
+                    await connection.query(`
+                    INSERT INTO hashtags_posts (hashtag_id, post_id)
+                    VALUES ($1, $2)`, [hashId.rows[0].id, postId.rows[0].id])
+                }
+            })
+        }
         res.sendStatus(200);
     } catch (error) {
         printError(res, error)
