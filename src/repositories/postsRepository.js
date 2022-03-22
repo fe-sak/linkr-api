@@ -12,7 +12,8 @@ async function read() {
     posts
     JOIN users ON posts.user_id  = users.id
   ORDER BY
-    timestamp DESC`);
+    timestamp DESC
+  LIMIT 20`);
 
   return posts;
 }
