@@ -19,6 +19,7 @@ CREATE TABLE "posts" (
   "comment" TEXT,
   "user_id" integer NOT NULL,
   "link" TEXT NOT NULL,
+  "timestamp" timestamp NOT NULL DEFAULT NOW(),
   CONSTRAINT "posts_pk" PRIMARY KEY ("id")
 );
 
