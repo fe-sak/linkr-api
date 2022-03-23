@@ -18,8 +18,8 @@ CREATE TABLE "posts" (
   "id" serial NOT NULL,
   "comment" TEXT,
   "user_id" integer NOT NULL,
-  "link" TEXT NOT NULL,
-  "timestamp" timestamp NOT NULL DEFAULT NOW(),
+  "link_id" integer NOT NULL,
+  "timestamp" TIMESTAMP NOT NULL DEFAULT 'NOW()',
   CONSTRAINT "posts_pk" PRIMARY KEY ("id")
 );
 
@@ -43,6 +43,15 @@ CREATE TABLE "hashtags_posts" (
   CONSTRAINT "hashtags_posts_pk" PRIMARY KEY ("id")
 );
 
+CREATE TABLE "links" (
+  "id" serial NOT NULL,
+  "title" TEXT NOT NULL,
+  "image" TEXT,
+  "description" TEXT,
+  "url" TEXT NOT NULL UNIQUE,
+  CONSTRAINT "links_pk" PRIMARY KEY ("id")
+);
+
 ALTER TABLE
   "sessions"
 ADD
@@ -52,6 +61,11 @@ ALTER TABLE
   "posts"
 ADD
   CONSTRAINT "posts_fk0" FOREIGN KEY ("user_id") REFERENCES "users"("id");
+
+ALTER TABLE
+  "posts"
+ADD
+  CONSTRAINT "posts_fk1" FOREIGN KEY ("link_id") REFERENCES "links"("id");
 
 ALTER TABLE
   "likes"
@@ -72,3 +86,40 @@ ALTER TABLE
   "hashtags_posts"
 ADD
   CONSTRAINT "hashtags_posts_fk1" FOREIGN KEY ("post_id") REFERENCES "posts"("id");
+
+SELECT
+  posts.id,
+  posts.comment,
+  users.username,
+  users.picture_url,
+  links.title,
+  links.image,
+  links.description,
+  links.url
+FROM
+  posts
+  JOIN users ON posts.user_id = users.id
+  JOIN links ON posts.link_id = links.id
+ORDER BY
+  timestamp DESC
+LIMIT
+  20;
+
+INSERT INTO
+  links (title, image, description, url)
+VALUES
+  (
+    'Teste',
+    'https://alternativagameselan.com.br/web/fotos/produtos_55_produto-teste-nao-usar_www.alternativagameselan.com.br_zz4ef5edb9b8.png',
+    'Descrição do teste',
+    'https://pt.wikipedia.org/wiki/Teste'
+  );
+
+INSERT INTO
+  posts ("comment", user_id, link_id)
+VALUES
+  (
+    'Este post é um teste!!!! AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa',
+    1,
+    1
+  );
