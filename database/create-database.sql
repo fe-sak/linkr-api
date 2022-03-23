@@ -18,8 +18,8 @@ CREATE TABLE "posts" (
   "id" serial NOT NULL,
   "comment" TEXT,
   "user_id" integer NOT NULL,
-  "link" TEXT NOT NULL,
-  "timestamp" timestamp NOT NULL DEFAULT NOW(),
+  "link_id" integer NOT NULL,
+  "timestamp" TIMESTAMP NOT NULL DEFAULT 'NOW()',
   CONSTRAINT "posts_pk" PRIMARY KEY ("id")
 );
 
@@ -43,6 +43,15 @@ CREATE TABLE "hashtags_posts" (
   CONSTRAINT "hashtags_posts_pk" PRIMARY KEY ("id")
 );
 
+CREATE TABLE "links" (
+  "id" serial NOT NULL,
+  "title" TEXT NOT NULL,
+  "image" TEXT,
+  "description" TEXT,
+  "url" TEXT NOT NULL UNIQUE,
+  CONSTRAINT "links_pk" PRIMARY KEY ("id")
+);
+
 ALTER TABLE
   "sessions"
 ADD
@@ -52,6 +61,11 @@ ALTER TABLE
   "posts"
 ADD
   CONSTRAINT "posts_fk0" FOREIGN KEY ("user_id") REFERENCES "users"("id");
+
+ALTER TABLE
+  "posts"
+ADD
+  CONSTRAINT "posts_fk1" FOREIGN KEY ("link_id") REFERENCES "links"("id");
 
 ALTER TABLE
   "likes"

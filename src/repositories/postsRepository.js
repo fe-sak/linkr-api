@@ -4,16 +4,21 @@ async function read() {
   const { rows: posts } = await connection.query(`
   SELECT
     posts.id,
-    comment,
-    link,
-    username,
-    picture_url
+    posts.comment,
+    users.username,
+    users.picture_url AS "userPic",
+    links.title AS "linkTitle",
+    links.image AS "linkImage",
+    links.description AS "linkDescription",
+    links.url AS url
   FROM
     posts
-    JOIN users ON posts.user_id  = users.id
+    JOIN users ON posts.user_id = users.id
+    JOIN links ON posts.link_id = links.id
   ORDER BY
     timestamp DESC
-  LIMIT 20`);
+  LIMIT
+    20`);
 
   return posts;
 }
