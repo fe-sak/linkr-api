@@ -72,12 +72,6 @@ async function login(req, res, next) {
         await userRepository.loginUser({
             token,
             userId: user.id
-        })
-
-        console.log({
-            token,
-            username: user.username,
-            pictureUrl: user.picture_url,
         });
 
         return res.send({
@@ -92,10 +86,11 @@ async function login(req, res, next) {
 
 async function logout(req, res, next) {
     const { userId } = res.locals.user;
+    console.log(userId);
 
     try {
         const user = await userRepository.findById({ userId });
-
+        console.log({user});
         if (!user) {
             return res.status(404).send('User not found');
         }
