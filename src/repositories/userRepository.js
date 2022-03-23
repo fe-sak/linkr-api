@@ -35,10 +35,19 @@ async function findUsername({ username }) {
     return user.rows[0];
 }
 
+async function findById({ userId }) {
+    const user = await connection.query(`
+        SELECT * FROM users
+        WHERE id = $1;
+    `, [userId]);
+
+    return user.rows[0];
+}
+
 async function deleteSession({ userId }) {
     await connection.query(`
         DELETE FROM sessions
-        WHERE user_id = $1
+        WHERE user_id = $1;
     `, [userId]);
 
     return true;
@@ -63,6 +72,7 @@ export {
     create,
     findEmail,
     findUsername,
+    findById,
     deleteSession,
     loginUser,
 }

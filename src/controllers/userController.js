@@ -74,13 +74,43 @@ async function login(req, res, next) {
             userId: user.id
         })
 
-        return res.send(token);
+        console.log({
+            token,
+            username: user.username,
+            pictureUrl: user.picture_url,
+        });
+
+        return res.send({
+            token,
+            username: user.username,
+            pictureUrl: user.picture_url,
+        });
     } catch (error) {
         return next(error);
     }
 }
 
+async function logout(req, res, next) {
+    const { userId } = res.locals.user;
+
+    try {
+        const user = await userRepository.findById({ userId });
+
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        await userRepository.deleteSession({ userId })
+
+        return res.sendStatus(204);
+    } catch (error) {
+        return next(error);
+    }
+}
+
+
 export {
     signUp,
     login,
+    logout,
 }
