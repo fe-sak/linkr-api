@@ -1,38 +1,41 @@
-import connection from "../database.js";
 import printError from "../utils/printError.js";
 import * as postsRepository from '../repositories/postsRepository.js';
+import createLinkSnippet from "../utils/createLinkSnippet.js";
 
 export async function postPosts(req, res) {
     try {
-        //req.locals.userToken = id
-        const id = 1
+        const id = res.locals.user.userId
         const comment =  req.body.comment || null
-        const postId = await connection.query(`
-        INSERT INTO posts (comment, user_id, link)
-        VALUES ($1, ${id}, $2)
-        RETURNING id`, [comment, req.body.link])
+        const url = req.body.link
+
+        const {rows: urlRows } = await postsRepository.searchUrl(url)
+
+        let postId
+
+        if(urlRows.length > 0){
+            postId = await postsRepository.insertPost(comment, id, urlRows[0].id)
+        }else{
+            const snippet = await createLinkSnippet(url)
+            if(snippet === null){
+                return res.status(422).send('invalid link')
+            }
+            const {title, image, description} = snippet
+            const urlId = await postsRepository.insertLink(title, image, description, url)
+
+            postId = await postsRepository.insertPost(comment, id, urlId.rows[0].id)
+        }
 
         if (comment){
             const arr = comment.split(' ')
             const tags = arr.filter(v => v[0]==='#')
             tags.map(async v => {
-                const {rowCount, rows} = await connection.query(`
-                SELECT id FROM hashtags
-                WHERE name=$1`,[v])
+                const {rowCount, rows} = await postsRepository.searchHashtag(v)
 
                 if(rowCount > 0){
-                    await connection.query(`
-                    INSERT INTO hashtags_posts (hashtag_id, post_id)
-                    VALUES ($1, $2)`, [rows[0].id, postId.rows[0].id])
+                    await postsRepository.insertHashtagPosts(rows[0].id, postId.rows[0].id)
                 }else{
-                    const hashId = await connection.query(`
-                    INSERT INTO hashtags (name)
-                    VALUES ($1)
-                    RETURNING id`, [v])
-
-                    await connection.query(`
-                    INSERT INTO hashtags_posts (hashtag_id, post_id)
-                    VALUES ($1, $2)`, [hashId.rows[0].id, postId.rows[0].id])
+                    const hashId = await postsRepository.insertHashtag(v)
+                    await postsRepository.insertHashtagPosts(hashId.rows[0].id, postId.rows[0].id)
                 }
             })
         }
@@ -49,4 +52,14 @@ export async function readPosts(req, res, next) {
   } catch (error) {
     next(error);
   }
+}
+
+export async function getHashtag(req,res){
+    try {
+        const { rows: hashtags } = await connection.query(`SELECT * FROM hashtags;`);
+        res.status(200).send(hashtags);
+    } catch (err) {
+        res.status(500).send(err);
+        console.log(err);
+    }
 }
