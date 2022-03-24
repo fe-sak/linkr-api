@@ -1,5 +1,5 @@
 import * as userRepository from '../repositories/userRepository.js';
-import * as postsRepository from '../repositories/postsRepository.js,';
+import * as postsRepository from '../repositories/postsRepository.js';
 import * as likeRepository from '../repositories/likeRepository.js';
 
 async function likeThePost(req, res, next) {
