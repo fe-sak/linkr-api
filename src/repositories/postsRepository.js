@@ -22,4 +22,14 @@ async function read() {
 
   return posts;
 }
-export { read };
+
+async function findById({ postId }) {
+  const post = await connection.query(`
+      SELECT * FROM posts
+      WHERE id = $1;
+  `, [postId]);
+
+  return post.rows[0];
+}
+
+export { read, findById, };

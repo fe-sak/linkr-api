@@ -4,7 +4,7 @@ async function create({
     email,
     password,
     username,
-    pictureUrl
+    pictureUrl,
 }) {
     const user = await connection.query(`
         INSERT INTO users
