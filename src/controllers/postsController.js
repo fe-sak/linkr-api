@@ -50,3 +50,13 @@ export async function readPosts(req, res, next) {
     next(error);
   }
 }
+
+export async function getHashtag(req,res){
+    try {
+        const { rows: hashtags } = await connection.query(`SELECT * FROM hashtags;`);
+        res.status(200).send(hashtags);
+    } catch (err) {
+        res.status(500).send(err);
+        console.log(err);
+    }
+}
