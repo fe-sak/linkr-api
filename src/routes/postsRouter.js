@@ -8,6 +8,6 @@ const postsRouter = Router();
 
 postsRouter.get('/posts', auth, readPosts);
 
-postsRouter.post('/posts', validateSchemaMiddleware(postSchema), postPosts); //missing token
+postsRouter.post('/posts', validateSchemaMiddleware(postSchema), auth, postPosts);
 
 export default postsRouter;
