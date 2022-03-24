@@ -56,7 +56,6 @@ export async function getHashtag(req,res){
         const { rows: hashtags } = await connection.query(`SELECT * FROM hashtags;`);
         res.status(200).send(hashtags);
     } catch (err) {
-        res.status(500).send(err);
-        console.log(err);
+        res.status(500).send(err); 
     }
 }
