@@ -1,7 +1,7 @@
 import printError from '../utils/printError.js';
 import * as postsRepository from '../repositories/postsRepository.js';
-import createLinkSnippet from '../utils/createLinkSnippet.js';
-import connection from '../database.js';
+import createLinkSnippet from "../utils/createLinkSnippet.js";
+import connection from "../database.js";
 
 export async function postPosts(req, res) {
   try {
@@ -31,11 +31,12 @@ export async function postPosts(req, res) {
       postId = await postsRepository.insertPost(comment, id, urlId.rows[0].id);
     }
 
-    if (comment) {
-      const arr = comment.split(' ');
-      const tags = arr.filter((v) => v[0] === '#');
-      tags.map(async (v) => {
-        const { rowCount, rows } = await postsRepository.searchHashtag(v);
+        if (comment){
+            const arr = comment.split(' ')
+            const tags = arr.filter(v => v[0] === '#').map(v => v.substr(1))
+            tags.map(async v => {
+                const {rowCount, rows} = await postsRepository.searchHashtag(v)
+
 
         if (rowCount > 0) {
           await postsRepository.insertHashtagPosts(
@@ -66,14 +67,22 @@ export async function readPosts(req, res, next) {
   }
 }
 
-export async function getHashtag(req, res) {
-  try {
-    const { rows: hashtags } = await connection.query(
-      `SELECT * FROM hashtags;`
-    );
-    res.status(200).send(hashtags);
-  } catch (err) {
-    res.status(500).send(err);
-    console.log(err);
-  }
+
+export async function getHashtag(req,res){
+    try {
+        const hashtags = await postsRepository.hashtagTrending();
+        res.status(200).send(hashtags);
+    } catch (err) {
+        res.status(500).send(err); 
+    }
+}
+
+export async function postByHashtag(req, res){
+    const { hashtag } = req.params;
+    try{
+        const posts = await postsRepository.getPostByHashtag(hashtag);
+        res.status(200).send(posts);
+    } catch (err) {
+        res.status(500).send(err);
+    }
 }
