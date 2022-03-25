@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   getHashtag,
+  postByHashtag,
   postPosts,
   readPosts,
 } from '../controllers/postsController.js';
@@ -20,5 +21,7 @@ postsRouter.post(
 );
 
 postsRouter.get('/hashtag', getHashtag);
+
+postsRouter.get('/hashtag/:hashtag', postByHashtag);
 
 export default postsRouter;
