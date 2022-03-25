@@ -45,7 +45,7 @@ CREATE TABLE "hashtags_posts" (
 
 CREATE TABLE "links" (
   "id" serial NOT NULL,
-  "title" TEXT NOT NULL,
+  "title" TEXT,
   "image" TEXT,
   "description" TEXT,
   "url" TEXT NOT NULL UNIQUE,
