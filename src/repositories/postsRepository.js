@@ -19,9 +19,9 @@ async function read() {
     posts
     JOIN users ON posts.user_id = users.id
     JOIN links ON posts.link_id = links.id
-    JOIN likes ON posts.id = likes.post_id
+    LEFT JOIN likes ON posts.id = likes.post_id
   ORDER BY
-    timestamp DESC
+    timestamp
   LIMIT
     20`);
 
@@ -29,54 +29,72 @@ async function read() {
 }
 
 async function searchUrl(url) {
-  const result = await connection.query(`
+  const result = await connection.query(
+    `
   SELECT id FROM links
-  WHERE url=$1`, [url])
+  WHERE url=$1`,
+    [url]
+  );
 
-  return result
+  return result;
 }
 
 async function insertPost(comment, id, linkId) {
-  const result = await connection.query(`
+  const result = await connection.query(
+    `
   INSERT INTO posts (comment, user_id, link_id)
   VALUES ($1, $2, $3)
-  RETURNING id`, [comment, id, linkId])
+  RETURNING id`,
+    [comment, id, linkId]
+  );
 
-  return result
+  return result;
 }
 
 async function insertLink(title, image, description, url) {
-  const result = await connection.query(`
+  const result = await connection.query(
+    `
   INSERT INTO links (title, image, description, url)
   VALUES ($1, $2, $3, $4)
-  RETURNING id`, [title, image, description, url])
+  RETURNING id`,
+    [title, image, description, url]
+  );
 
-  return result
+  return result;
 }
 
 async function searchHashtag(name) {
-  const result = await connection.query(`
+  const result = await connection.query(
+    `
   SELECT id FROM hashtags
-  WHERE name=$1`, [name])
+  WHERE name=$1`,
+    [name]
+  );
 
-  return result
+  return result;
 }
 
 async function insertHashtagPosts(hashtag_id, post_id) {
-  const result = await connection.query(`
+  const result = await connection.query(
+    `
   INSERT INTO hashtags_posts (hashtag_id, post_id)
-  VALUES ($1, $2)`, [hashtag_id, post_id])
+  VALUES ($1, $2)`,
+    [hashtag_id, post_id]
+  );
 
-  return result
+  return result;
 }
 
 async function insertHashtag(name) {
-  const result = await connection.query(`
+  const result = await connection.query(
+    `
   INSERT INTO hashtags (name)
   VALUES ($1)
-  RETURNING id`, [name])
+  RETURNING id`,
+    [name]
+  );
 
-  return result
+  return result;
 }
 
 export {
@@ -86,5 +104,5 @@ export {
   insertLink,
   searchHashtag,
   insertHashtagPosts,
-  insertHashtag
+  insertHashtag,
 };
