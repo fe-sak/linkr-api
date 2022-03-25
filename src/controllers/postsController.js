@@ -56,10 +56,19 @@ export async function readPosts(req, res, next) {
 
 export async function getHashtag(req,res){
     try {
-        const { rows: hashtags } = await connection.query(`SELECT * FROM hashtags;`);
+        const hashtags = await postsRepository.hashtagTrending();
         res.status(200).send(hashtags);
     } catch (err) {
+        res.status(500).send(err); 
+    }
+}
+
+export async function postByHashtag(req, res){
+    const { hashtag } = req.params;
+    try{
+        const posts = await postsRepository.getPostByHashtag(hashtag);
+        res.status(200).send(posts);
+    } catch (err) {
         res.status(500).send(err);
-        console.log(err);
     }
 }
