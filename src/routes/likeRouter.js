@@ -5,5 +5,6 @@ import { auth } from '../middlewares/authMiddleware.js';
 const router = Router();
 
 router.post('/posts/:id/like', auth, likeController.likeThePost);
+router.delete('/posts/:id/like', auth, likeController.dislikeThePost);
 
 export default router;
