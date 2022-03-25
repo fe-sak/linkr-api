@@ -1,6 +1,8 @@
 import printError from "../utils/printError.js";
 import * as postsRepository from '../repositories/postsRepository.js';
 import createLinkSnippet from "../utils/createLinkSnippet.js";
+import connection from "../database.js";
+
 
 export async function postPosts(req, res) {
     try {
@@ -27,7 +29,7 @@ export async function postPosts(req, res) {
 
         if (comment){
             const arr = comment.split(' ')
-            const tags = arr.filter(v => v[0]==='#')
+            const tags = arr.filter(v => v[0] === '#').map(v => v.substr(1))
             tags.map(async v => {
                 const {rowCount, rows} = await postsRepository.searchHashtag(v)
 
