@@ -73,7 +73,34 @@ async function insertHashtag(name) {
 
   return result
 }
+async function hashtagTrending(){
+  const { rows: hashtags } = await connection.query(
+    `SELECT * FROM hashtags;`
+  );
+  return hashtags;
+}
 
+async function getPostByHashtag(name){
+  const { rows: posts } = await connection.query(
+    `SELECT
+    posts.id,
+    posts.comment,
+    users.username,
+    users.picture_url AS "userPic",
+    links.title AS "linkTitle",
+    links.image AS "linkImage",
+    links.description AS "linkDescription",
+    links.url AS url
+  FROM
+    posts
+    JOIN users ON posts.user_id = users.id
+    JOIN links ON posts.link_id = links.id
+    JOIN hashtags_posts hp ON posts.id=hp.post_id
+    JOIN hashtags h ON hp.hashtag_id=h.id
+    WHERE h.name=$1`, [name]
+  );
+  return posts;
+}
 export {
   read,
   searchUrl,
@@ -81,5 +108,7 @@ export {
   insertLink,
   searchHashtag,
   insertHashtagPosts,
-  insertHashtag
+  insertHashtag,
+  hashtagTrending,
+  getPostByHashtag
 };
