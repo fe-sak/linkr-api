@@ -14,6 +14,19 @@ async function create({
     return true;
 }
 
+async function dislike({
+    userId,
+    postId,
+}) {
+    await connection.query(`
+        DELETE FROM likes
+        WHERE user_id = $1 AND post_id = $2;
+    `, [userId, postId]);
+
+    return true;
+}
+
 export {
     create,
+    dislike,
 };
