@@ -39,7 +39,7 @@ export async function postPosts(req, res) {
                 }
             })
         }
-        res.sendStatus(200);
+        return res.sendStatus(200);
     } catch (error) {
         printError(res, error)
     }

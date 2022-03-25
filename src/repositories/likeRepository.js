@@ -1,3 +1,5 @@
+import connection from '../database.js';
+
 async function create({
     userId,
     postId,

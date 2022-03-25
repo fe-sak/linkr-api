@@ -13,9 +13,11 @@ async function likeThePost(req, res, next) {
         if (!user) {
             return res.sendStatus(401);
         }
+        console.log({user})
+
 
         const post = await postsRepository.findById({ postId: id });
-
+        console.log({post})
         if (!post) {
             return res.sendStatus(404);
         }
