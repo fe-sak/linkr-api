@@ -1,14 +1,23 @@
-import { Router } from "express";
-import { getHashtag, postPosts, readPosts } from "../controllers/postsController.js";
-import { validateSchemaMiddleware } from "../middlewares/validateSchemaMiddleware.js";
-import postSchema from "../schemas/postSchema.js";
+import { Router } from 'express';
+import {
+  getHashtag,
+  postPosts,
+  readPosts,
+} from '../controllers/postsController.js';
+import { validateSchemaMiddleware } from '../middlewares/validateSchemaMiddleware.js';
+import postSchema from '../schemas/postSchema.js';
 import { auth } from '../middlewares/authMiddleware.js';
 
 const postsRouter = Router();
 
-postsRouter.get('/posts', auth, readPosts);
+postsRouter.get('/posts', readPosts);
 
-postsRouter.post('/posts', validateSchemaMiddleware(postSchema), auth, postPosts);
+postsRouter.post(
+  '/posts',
+  validateSchemaMiddleware(postSchema),
+  auth,
+  postPosts
+);
 
 postsRouter.get('/hashtag', getHashtag);
 
