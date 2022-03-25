@@ -7,6 +7,13 @@ CREATE TABLE "users" (
   CONSTRAINT "users_pk" PRIMARY KEY ("id")
 );
 
+CREATE TABLE "sessions" (
+  "id" serial NOT NULL,
+  "token" TEXT NOT NULL UNIQUE,
+  "user_id" integer NOT NULL,
+  CONSTRAINT "sessions_pk" PRIMARY KEY ("id")
+);
+
 CREATE TABLE "posts" (
   "id" serial NOT NULL,
   "comment" TEXT,
@@ -79,8 +86,3 @@ ALTER TABLE
   "hashtags_posts"
 ADD
   CONSTRAINT "hashtags_posts_fk1" FOREIGN KEY ("post_id") REFERENCES "posts"("id");
-
-ALTER TABLE
-  "links"
-ALTER COLUMN
-  "title" DROP NOT NULL;
