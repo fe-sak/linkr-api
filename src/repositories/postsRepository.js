@@ -5,23 +5,24 @@ async function read() {
   SELECT
     posts.id,
     posts.comment,
-    posts.user_id AS "user_id",
-    users.username,
-    users.picture_url AS "userPic",
+    posts.user_id AS "userId",
+    usersP.username,
+    usersP.picture_url AS "userPic",
     links.title AS "linkTitle",
     links.image AS "linkImage",
     links.description AS "linkDescription",
     links.url AS url,
-    likeS.id AS like_id,
-    likes.user_id AS like_user_id,
-    likes.post_id AS like_post_id
+    likeS.id AS "likeId",
+    likes.user_id AS "likeUserId",
+    usersL.username AS "likeUsername"
   FROM
     posts
-    JOIN users ON posts.user_id = users.id
+    JOIN users usersP ON posts.user_id = usersP.id
     JOIN links ON posts.link_id = links.id
     LEFT JOIN likes ON posts.id = likes.post_id
+    LEFT JOIN users usersL ON likes.user_id=usersL.id
   ORDER BY
-    timestamp
+    posts.id DESC
   LIMIT
     20`);
 
