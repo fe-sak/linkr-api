@@ -106,14 +106,22 @@ async function insertHashtag(name) {
 
   return result;
 }
-async function hashtagTrending(){
-  const { rows: hashtags } = await connection.query(
-    `SELECT * FROM hashtags;`
-  );
+async function hashtagTrending() {
+  const { rows: hashtags } = await connection.query(`SELECT * FROM hashtags;`);
   return hashtags;
 }
 
-async function getPostByHashtag(name){
+async function deleteById(id) {
+  try {
+    await connection.query(`DELETE FROM posts WHERE id=$1`, [id]);
+    await connection.query('DELETE FROM likes WHERE post_id=$1', [id]);
+    await connection.query('DELETE FROM hashtags_posts WHERE post_id=$1', [id]);
+  } catch (error) {
+    return error;
+  }
+}
+
+async function getPostByHashtag(name) {
   const { rows: posts } = await connection.query(
     `SELECT
     posts.id,
@@ -130,7 +138,8 @@ async function getPostByHashtag(name){
     JOIN links ON posts.link_id = links.id
     JOIN hashtags_posts hp ON posts.id=hp.post_id
     JOIN hashtags h ON hp.hashtag_id=h.id
-    WHERE h.name=$1`, [name]
+    WHERE h.name=$1`,
+    [name]
   );
   return posts;
 }
@@ -144,5 +153,6 @@ export {
   insertHashtag,
   findById,
   hashtagTrending,
-  getPostByHashtag
+  getPostByHashtag,
+  deleteById,
 };
