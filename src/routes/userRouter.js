@@ -5,7 +5,7 @@ import { validateSchemaMiddleware } from '../middlewares/validateSchemaMiddlewar
 import { loginSchema, signUpSchema } from '../schemas/userSchema.js';
 
 const router = Router();
-
+router.get('/users', userController.getUsers);
 router.post('/users', validateSchemaMiddleware(signUpSchema), userController.signUp);
 router.post('/users/login', validateSchemaMiddleware(loginSchema), userController.login);
 router.delete('/users/logout', auth, userController.logout);
