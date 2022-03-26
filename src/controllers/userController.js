@@ -102,9 +102,21 @@ async function logout(req, res, next) {
     }
 }
 
+async function getById(req, res) {
+    const id = req.params.id;
+
+    if (!Number.isInteger(parseInt(id)) || id < 0){
+        return res.status(404).send('invalid id');
+    }
+
+    const result = await userRepository.getUser(id);
+
+    res.send(result.rows)
+}
 
 export {
     signUp,
     login,
     logout,
+    getById,
 }

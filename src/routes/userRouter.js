@@ -9,5 +9,6 @@ const router = Router();
 router.post('/users', validateSchemaMiddleware(signUpSchema), userController.signUp);
 router.post('/users/login', validateSchemaMiddleware(loginSchema), userController.login);
 router.delete('/users/logout', auth, userController.logout);
+router.get('/users/:id', userController.getById)
 
 export default router;
