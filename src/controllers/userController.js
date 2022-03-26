@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken';
 import * as userRepository from '../repositories/userRepository.js';
+import { generateToken } from '../utils/generateToken.js';
 
 async function signUp(req, res, next) {
     const {
@@ -36,14 +36,6 @@ async function signUp(req, res, next) {
     } catch (error) {
         return next(error);
     }
-}
-
-function generateToken({ userId }) {
-    const key = process.env.JWT_SECRET;
-    const config = { expiresIn: 60 * 60 * 24 * 2 }; // 2 dias em segundos
-
-    const token = jwt.sign({ userId }, key, config);
-    return token;
 }
 
 async function login(req, res, next) {
@@ -101,7 +93,17 @@ async function logout(req, res, next) {
         return next(error);
     }
 }
+async function getById(req, res) {
+    const id = req.params.id;
 
+    if (!Number.isInteger(parseInt(id)) || id < 0){
+        return res.status(404).send('invalid id');
+    }
+
+    const result = await userRepository.getUser(id);
+
+    res.send(result.rows)
+}
 async function getUsers(req, res){
     const { text } = req.query;
     try{
@@ -116,10 +118,10 @@ async function getUsers(req, res){
     }
 }
 
-
 export {
     signUp,
     login,
     logout,
     getUsers,
+    getById,
 }

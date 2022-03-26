@@ -29,6 +29,15 @@ async function read() {
   return posts;
 }
 
+async function findById({ postId }) {
+  const post = await connection.query(`
+      SELECT * FROM posts
+      WHERE id = $1;
+  `, [postId]);
+
+  return post.rows[0];
+}
+
 async function searchUrl(url) {
   const result = await connection.query(
     `
@@ -133,6 +142,7 @@ export {
   searchHashtag,
   insertHashtagPosts,
   insertHashtag,
+  findById,
   hashtagTrending,
   getPostByHashtag
 };
