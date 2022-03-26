@@ -102,9 +102,24 @@ async function logout(req, res, next) {
     }
 }
 
+async function getUsers(req, res){
+    const { text } = req.query;
+    try{
+        if(text.length>=3){
+            const list = await userRepository.searchUser(text);
+            res.status(200).send(list);
+            return;
+        }
+        res.status(200).send([]);        
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
 
 export {
     signUp,
     login,
     logout,
+    getUsers,
 }

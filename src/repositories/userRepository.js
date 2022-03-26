@@ -68,6 +68,15 @@ async function loginUser({
     return session.rows[0];
 }
 
+async function searchUser(text){
+    const { rows: users } = await connection.query(`
+        SELECT id, username, picture_url FROM users
+        WHERE UPPER(username) LIKE UPPER($1);
+    `, [`${text}%`]);
+
+    return users;
+}
+
 export {
     create,
     findEmail,
@@ -75,4 +84,5 @@ export {
     findById,
     deleteSession,
     loginUser,
+    searchUser,
 }
