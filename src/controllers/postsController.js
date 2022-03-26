@@ -77,3 +77,13 @@ export async function getHashtag(req, res) {
     console.log(err);
   }
 }
+
+export async function deletePost(req, res, next) {
+  const { postId } = req.params;
+  try {
+    await postsRepository.deleteById(postId);
+    return res.sendStatus(200);
+  } catch (error) {
+    next(error);
+  }
+}

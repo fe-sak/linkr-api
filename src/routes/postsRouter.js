@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+  deletePost,
   getHashtag,
   postPosts,
   readPosts,
@@ -20,5 +21,7 @@ postsRouter.post(
 );
 
 postsRouter.get('/hashtag', getHashtag);
+
+postsRouter.delete('/posts/:postId', auth, deletePost);
 
 export default postsRouter;
