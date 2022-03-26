@@ -113,9 +113,9 @@ async function hashtagTrending() {
 
 async function deleteById(id) {
   try {
-    await connection.query(`DELETE FROM posts WHERE id=$1`, [id]);
     await connection.query('DELETE FROM likes WHERE post_id=$1', [id]);
     await connection.query('DELETE FROM hashtags_posts WHERE post_id=$1', [id]);
+    await connection.query(`DELETE FROM posts WHERE id=$1`, [id]);
   } catch (error) {
     return error;
   }
