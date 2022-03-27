@@ -5,62 +5,48 @@ import connection from "../database.js";
 
 export async function postPosts(req, res) {
   try {
-    const id = res.locals.user.userId;
-    const comment = req.body.comment || null;
-    const url = req.body.link;
+      //req.locals.userToken = id
+      const id = 1
+      const comment =  req.body.comment || null
+      const postId = await connection.query(`
+      INSERT INTO posts (comment, user_id, link)
+      VALUES ($1, ${id}, $2)
+      RETURNING id`, [comment, req.body.link])
 
-    const { rows: urlRows } = await postsRepository.searchUrl(url);
+      if (comment){
+          const arr = comment.split(' ')
+          const tags = arr.filter(v => v[0]==='#')
+          tags.map(async v => {
+              const {rowCount, rows} = await connection.query(`
+              SELECT id FROM hashtags
+              WHERE name=$1`,[v])
 
-    let postId;
+              if(rowCount > 0){
+                  await connection.query(`
+                  INSERT INTO hashtags_posts (hashtag_id, post_id)
+                  VALUES ($1, $2)`, [rows[0].id, postId.rows[0].id])
+              }else{
+                  const hashId = await connection.query(`
+                  INSERT INTO hashtags (name)
+                  VALUES ($1)
+                  RETURNING id`, [v])
 
-    if (urlRows.length > 0) {
-      postId = await postsRepository.insertPost(comment, id, urlRows[0].id);
-    } else {
-      const snippet = await createLinkSnippet(url);
-      if (snippet === null) {
-        return res.status(422).send('invalid link');
+                  await connection.query(`
+                  INSERT INTO hashtags_posts (hashtag_id, post_id)
+                  VALUES ($1, $2)`, [hashId.rows[0].id, postId.rows[0].id])
+              }
+          })
       }
-      const { title, image, description } = snippet;
-      const urlId = await postsRepository.insertLink(
-        title,
-        image,
-        description,
-        url
-      );
-
-      postId = await postsRepository.insertPost(comment, id, urlId.rows[0].id);
-    }
-
-        if (comment){
-            const arr = comment.split(' ')
-            const tags = arr.filter(v => v[0] === '#').map(v => v.substr(1))
-            tags.map(async v => {
-                const {rowCount, rows} = await postsRepository.searchHashtag(v)
-
-
-        if (rowCount > 0) {
-          await postsRepository.insertHashtagPosts(
-            rows[0].id,
-            postId.rows[0].id
-          );
-        } else {
-          const hashId = await postsRepository.insertHashtag(v);
-          await postsRepository.insertHashtagPosts(
-            hashId.rows[0].id,
-            postId.rows[0].id
-          );
-        }
-      });
-    }
-    res.sendStatus(200);
+      res.sendStatus(200);
   } catch (error) {
-    printError(res, error);
+      printError(res, error)
   }
 }
 
 export async function readPosts(req, res, next) {
   try {
     const posts = await postsRepository.read();
+    
     return res.send(posts);
   } catch (error) {
     next(error);

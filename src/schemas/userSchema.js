@@ -9,7 +9,7 @@ const signUpSchema = joi.object({
   username: joi.string().min(3).max(30).required(),
   pictureUrl: joi
     .string()
-    .pattern(/https?:\/\/.*.(?:png|jpg)/)
+    .pattern(/https|http?:\/\/.*.(?:png|jpg)/)
     .required(),
 });
 
