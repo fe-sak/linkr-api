@@ -24,6 +24,7 @@ postsRouter.post(
   postPosts
 );
 
+
 postsRouter.delete('/posts/:postId', auth, deletePost);
 
 postsRouter.get('/hashtag', getHashtag);
