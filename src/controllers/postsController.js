@@ -86,3 +86,36 @@ export async function postByHashtag(req, res){
         res.status(500).send(err);
     }
 }
+
+export async function updatePost(req, res){
+  const { comment, id : postId } = req.body;
+  try{
+    await postsRepository.updateComment(comment, postId, res.locals.user.userId);
+    await postsRepository.deleteHashtagPostItem(postId);
+    if (comment){
+      const arr = comment.split(' ')
+      const tags = arr.filter(v => v[0] === '#').map(v => v.substr(1))
+      tags.map(async v => {
+        const {rowCount, rows} = await postsRepository.searchHashtag(v)
+        if (rowCount > 0) {
+          await postsRepository.insertHashtagPosts(
+            rows[0].id,
+            postId
+          );
+        } else {
+          const hashId = await postsRepository.insertHashtag(v);
+          await postsRepository.insertHashtagPosts(
+          hashId.rows[0].id,
+          postId
+          );
+        }
+      });
+    }
+
+    res.sendStatus(200);
+  } catch (err) {
+    res.status(500).send(err);
+    console.log(err);
+  }
+  
+}
