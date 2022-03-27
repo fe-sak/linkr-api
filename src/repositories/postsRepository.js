@@ -106,14 +106,53 @@ async function insertHashtag(name) {
 
   return result;
 }
-async function hashtagTrending(){
-  const { rows: hashtags } = await connection.query(
-    `SELECT * FROM hashtags;`
-  );
+async function hashtagTrending() {
+  const { rows: hashtags } = await connection.query(`SELECT * FROM hashtags;`);
   return hashtags;
 }
 
-async function getPostByHashtag(name){
+async function deleteById(id) {
+  try {
+    await connection.query('DELETE FROM likes WHERE post_id=$1', [id]);
+    await connection.query('DELETE FROM hashtags_posts WHERE post_id=$1', [id]);
+    await connection.query(`DELETE FROM posts WHERE id=$1`, [id]);
+  } catch (error) {
+    return error;
+  }
+}
+
+async function getPostByUser(id) {
+  const result = await connection.query(`
+   SELECT
+    posts.id,
+    posts.comment,
+    posts.user_id AS "userId",
+    usersP.username,
+    usersP.picture_url AS "userPic",
+    links.title AS "linkTitle",
+    links.image AS "linkImage",
+    links.description AS "linkDescription",
+    links.url AS url,
+    likeS.id AS "likeId",
+    likes.user_id AS "likeUserId",
+    usersL.username AS "likeUsername"
+  FROM
+    posts
+    JOIN users usersP ON posts.user_id = usersP.id
+    JOIN links ON posts.link_id = links.id
+    LEFT JOIN likes ON posts.id = likes.post_id
+    LEFT JOIN users usersL ON likes.user_id=usersL.id
+  WHERE
+    usersP.id=$1
+  ORDER BY
+    posts.id DESC
+  LIMIT
+    20`, [id]);
+
+  return result
+}
+
+async function getPostByHashtag(name) {
   const { rows: posts } = await connection.query(
     `SELECT
     posts.id,
@@ -130,7 +169,8 @@ async function getPostByHashtag(name){
     JOIN links ON posts.link_id = links.id
     JOIN hashtags_posts hp ON posts.id=hp.post_id
     JOIN hashtags h ON hp.hashtag_id=h.id
-    WHERE h.name=$1`, [name]
+    WHERE h.name=$1`,
+    [name]
   );
   return posts;
 }
@@ -144,5 +184,7 @@ export {
   insertHashtag,
   findById,
   hashtagTrending,
-  getPostByHashtag
+  getPostByHashtag,
+  deleteById,
+  getPostByUser,
 };

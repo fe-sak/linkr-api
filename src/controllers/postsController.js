@@ -72,3 +72,29 @@ export async function postByHashtag(req, res){
         res.status(500).send(err);
     }
 }
+
+export async function deletePost(req, res, next) {
+  const { postId } = req.params;
+  try {
+    await postsRepository.deleteById(postId);
+    return res.sendStatus(200);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getById(req, res) {
+  const id = req.params.id;
+  try {
+    if (!Number.isInteger(parseInt(id)) || id < 0) {
+      return res.status(404).send('invalid id');
+    }
+  
+    const result = await postsRepository.getPostByUser(id);
+  
+    res.send(result.rows)
+    
+  } catch (error) {
+    printError(res, error)
+  }
+}
