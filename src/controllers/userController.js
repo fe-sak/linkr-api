@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt'
 import * as userRepository from '../repositories/userRepository.js';
 import { generateToken } from '../utils/generateToken.js';
+import printError from '../utils/printError.js';
 
 async function signUp(req, res, next) {
     const {
@@ -93,17 +94,23 @@ async function logout(req, res, next) {
         return next(error);
     }
 }
+
 async function getById(req, res) {
     const id = req.params.id;
+    try {
+        if (!Number.isInteger(parseInt(id)) || id < 0) {
+            return res.status(404).send('invalid id');
+        }
 
-    if (!Number.isInteger(parseInt(id)) || id < 0){
-        return res.status(404).send('invalid id');
+        const result = await userRepository.getUser(id);
+
+        res.send(result.rows[0])
+
+    } catch (error) {
+        printError(res, error)
     }
-
-    const result = await userRepository.getUser(id);
-
-    res.send(result.rows)
 }
+
 async function getUsers(req, res){
     const { text } = req.query;
     try{
