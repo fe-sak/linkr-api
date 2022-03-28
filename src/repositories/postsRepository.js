@@ -174,6 +174,19 @@ async function getPostByHashtag(name) {
   );
   return posts;
 }
+
+async function updateComment(comment, postId, userId){
+  await connection.query(
+    `UPDATE posts SET comment=$1 WHERE id=$2 AND user_id=$3`,
+    [comment, postId, userId]);
+}
+
+async function deleteHashtagPostItem(id){
+  await connection.query(
+    `DELETE FROM hashtags_posts WHERE post_id=$1`, [id]
+  );
+}
+
 export {
   read,
   searchUrl,
@@ -185,6 +198,8 @@ export {
   findById,
   hashtagTrending,
   getPostByHashtag,
+  updateComment,
+  deleteHashtagPostItem,
   deleteById,
   getPostByUser,
 };
