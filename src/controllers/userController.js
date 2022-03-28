@@ -69,7 +69,7 @@ async function login(req, res, next) {
 
         return res.send({
             token,
-            userId: id.user_id,
+            userId: user.id,
             username: user.username,
             pictureUrl: user.picture_url,
         });
