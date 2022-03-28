@@ -112,10 +112,15 @@ async function insertHashtag(name) {
 async function hashtagTrending() {
   const { rows: hashtags } = await connection.query(`
     SELECT
-      *
+      name,
+      COUNT(name) as count
     FROM
       hashtags_posts
-      JOIN hashtags ON hashtags.id = hashtags_posts.hashtag_id`);
+      JOIN hashtags ON hashtags.id = hashtags_posts.hashtag_id
+    GROUP BY
+      hashtags.id
+    ORDER BY 
+      count DESC`);
   return hashtags;
 }
 
