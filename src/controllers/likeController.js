@@ -26,7 +26,9 @@ async function likeThePost(req, res, next) {
             postId: id,
         })
 
-        return res.sendStatus(201);
+        const findLikes = await postsRepository.findPostLikes({ postId: id });
+
+        return res.status(201).send(findLikes);
     } catch (error) {
         return next(error);
     }
@@ -55,7 +57,9 @@ async function dislikeThePost(req, res, next) {
             postId: id,
         })
 
-        return res.sendStatus(204);
+        const findLikes = await postsRepository.findPostLikes({ postId: id });
+
+        return res.status(200).send(findLikes);
     } catch (error) {
         return next(error);
     }
