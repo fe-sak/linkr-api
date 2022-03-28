@@ -1,7 +1,6 @@
 import printError from '../utils/printError.js';
 import * as postsRepository from '../repositories/postsRepository.js';
 import createLinkSnippet from "../utils/createLinkSnippet.js";
-import connection from "../database.js";
 
 export async function postPosts(req, res) {
   try {
