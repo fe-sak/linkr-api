@@ -32,9 +32,11 @@ export async function postPosts(req, res) {
 
         if (comment){
             const arr = comment.split(' ')
-            const tags = arr.filter(v => v[0] === '#').map(v => v.substr(1))
+            const tags = arr.filter(v => v[0] === '#').map(v => v.substr(1).trim())
+
             tags.map(async v => {
-                const {rowCount, rows} = await postsRepository.searchHashtag(v)
+              if (v.length > 0)  {
+        const {rowCount, rows} = await postsRepository.searchHashtag(v)
 
 
         if (rowCount > 0) {
@@ -48,7 +50,7 @@ export async function postPosts(req, res) {
             hashId.rows[0].id,
             postId.rows[0].id
           );
-        }
+        }}
       });
     }
     res.sendStatus(200);
@@ -117,8 +119,9 @@ export async function updatePost(req, res){
     await postsRepository.deleteHashtagPostItem(postId);
     if (comment){
       const arr = comment.split(' ')
-      const tags = arr.filter(v => v[0] === '#').map(v => v.substr(1))
+      const tags = arr.filter(v => v[0] === '#').map(v => v.substr(1).trim())
       tags.map(async v => {
+        if (v.length > 0){
         const {rowCount, rows} = await postsRepository.searchHashtag(v)
         if (rowCount > 0) {
           await postsRepository.insertHashtagPosts(
@@ -132,7 +135,7 @@ export async function updatePost(req, res){
           postId
           );
         }
-      });
+      }});
     }
 
     res.sendStatus(200);
