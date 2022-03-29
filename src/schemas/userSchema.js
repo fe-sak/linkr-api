@@ -7,10 +7,7 @@ const signUpSchema = joi.object({
     .required(),
   password: joi.string().min(6).required(),
   username: joi.string().min(3).max(30).required(),
-  pictureUrl: joi
-    .string()
-    .pattern(/https|http?:\/\/.*.(?:png|jpg)/)
-    .required(),
+  pictureUrl: joi.string().uri(),
 });
 
 const loginSchema = joi.object({

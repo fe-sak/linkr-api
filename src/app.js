@@ -10,6 +10,10 @@ app.use(cors());
 
 app.use(router);
 
+setInterval(() => {
+  // participantsService.remove();
+}, 20000);
+
 app.listen(process.env.PORT, () => {
   console.log(`Server listening on port ${process.env.PORT}`);
 });
