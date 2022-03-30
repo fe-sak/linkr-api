@@ -1,7 +1,8 @@
 import connection from '../database.js';
 
-async function read() {
-  const { rows: posts } = await connection.query(`
+async function read({ olderThan }) {
+  const dependencies = [];
+  let query = `
   SELECT
     posts.id,
     posts.comment,
@@ -23,8 +24,14 @@ async function read() {
     LEFT JOIN users "usersL" ON likes.user_id="usersL".id
   ORDER BY
     posts.id DESC
-  LIMIT
-    20`);
+  `
+  
+  if (olderThan) {
+    query += ` OFFSET $1`;
+    dependencies.push(olderThan);
+  }
+  
+  const { rows: posts } = await connection.query(`${ query } LIMIT 5;`, dependencies);
   
   return posts;
 }

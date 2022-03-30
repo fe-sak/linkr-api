@@ -60,8 +60,9 @@ export async function postPosts(req, res) {
 }
 
 export async function readPosts(req, res, next) {
+  const { olderThan } = req.query;
   try {
-    const posts = await postsRepository.read();
+    const posts = await postsRepository.read({ olderThan });
     return res.send(posts);
   } catch (error) {
     next(error);
