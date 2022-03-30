@@ -40,3 +40,19 @@ export async function deleteRepost(req, res) {
         printError(res, error)
     }
 }
+
+export async function getReposts(req, res) {
+    try {
+        const postId = req.params.postId;
+
+        if (!isGoodId(postId)) {
+            return res.status(404).send('invalid id');
+        }
+
+        const {rows} = await repostsRepository.getReposts(postId)
+        res.send(rows)
+
+    } catch (error) {
+        printError(res, error)
+    }
+}

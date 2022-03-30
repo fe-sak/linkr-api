@@ -16,3 +16,11 @@ export async function deleteRepost(userId, postId) {
     `,[postId, userId])
     return result
 }
+
+export async function getReposts(postId){
+  const result = await connection.query(`
+    SELECT * FROM reposts
+    WHERE post_id=$1
+    `, [postId])
+  return result
+}
