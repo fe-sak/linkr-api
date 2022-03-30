@@ -23,6 +23,14 @@ CREATE TABLE "posts" (
   CONSTRAINT "posts_pk" PRIMARY KEY ("id")
 );
 
+CREATE TABLE "comments" (
+  "id" serial NOT NULL,
+  "post_id" integer NOT NULL,
+  "user_id" integer NOT NULL,
+  "text" varchar(100) NOT NULL,
+  CONSTRAINT "comments_pk" PRIMARY KEY ("id")
+);
+
 CREATE TABLE "likes" (
   "id" serial NOT NULL,
   "user_id" integer NOT NULL,
@@ -86,3 +94,13 @@ ALTER TABLE
   "hashtags_posts"
 ADD
   CONSTRAINT "hashtags_posts_fk1" FOREIGN KEY ("post_id") REFERENCES "posts"("id");
+
+ALTER TABLE
+  "comments"
+ADD
+  CONSTRAINT "comments_fk0" FOREIGN KEY ("post_id") REFERENCES "posts"("id");
+
+ALTER TABLE
+  "comments"
+ADD
+  CONSTRAINT "comments_fk1" FOREIGN KEY ("user_id") REFERENCES "users"("id");
