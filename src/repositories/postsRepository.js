@@ -30,8 +30,8 @@ async function read({ olderThan }) {
     query += ` OFFSET $1`;
     dependencies.push(olderThan);
   }
-  
-  const { rows: posts } = await connection.query(`${ query } LIMIT 5;`, dependencies);
+
+  const { rows: posts } = await connection.query(`${ query } LIMIT 10;`, dependencies);
   
   return posts;
 }
