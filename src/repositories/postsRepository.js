@@ -29,7 +29,7 @@ async function read() {
   return posts;
 }
 
-async function findById({ postId }) {
+async function findById({ postId }) {//se mexer nessa função avisar o time
   const post = await connection.query(
     `
       SELECT * FROM posts

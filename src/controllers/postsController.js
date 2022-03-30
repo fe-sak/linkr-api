@@ -1,6 +1,7 @@
 import printError from '../utils/printError.js';
 import * as postsRepository from '../repositories/postsRepository.js';
 import createLinkSnippet from '../utils/createLinkSnippet.js';
+import isGoodId from '../utils/checkId.js';
 
 export async function postPosts(req, res) {
   try {
@@ -99,7 +100,8 @@ export async function deletePost(req, res, next) {
 export async function getById(req, res) {
   const id = req.params.id;
   try {
-    if (!Number.isInteger(parseInt(id)) || id < 0) {
+    
+    if (!isGoodId(id)) {
       return res.status(404).send('invalid id');
     }
 
