@@ -30,11 +30,14 @@ export async function postPosts(req, res) {
       postId = await postsRepository.insertPost(comment, id, urlId.rows[0].id);
     }
 
-    if (comment) {
-      const arr = comment.split(' ');
-      const tags = arr.filter((v) => v[0] === '#').map((v) => v.substr(1));
-      tags.map(async (v) => {
-        const { rowCount, rows } = await postsRepository.searchHashtag(v);
+        if (comment){
+            const arr = comment.split(' ')
+            const tags = arr.filter(v => v[0] === '#').map(v => v.substr(1).trim())
+
+            tags.map(async v => {
+              if (v.length > 0)  {
+        const {rowCount, rows} = await postsRepository.searchHashtag(v)
+
 
         if (rowCount > 0) {
           await postsRepository.insertHashtagPosts(
@@ -47,7 +50,7 @@ export async function postPosts(req, res) {
             hashId.rows[0].id,
             postId.rows[0].id
           );
-        }
+        }}
       });
     }
     res.sendStatus(200);
@@ -117,18 +120,21 @@ export async function updatePost(req, res) {
       res.locals.user.userId
     );
     await postsRepository.deleteHashtagPostItem(postId);
-    if (comment) {
-      const arr = comment.split(' ');
-      const tags = arr.filter((v) => v[0] === '#').map((v) => v.substr(1));
-      tags.map(async (v) => {
-        const { rowCount, rows } = await postsRepository.searchHashtag(v);
+
+    if (comment){
+      const arr = comment.split(' ')
+      const tags = arr.filter(v => v[0] === '#').map(v => v.substr(1).trim())
+      tags.map(async v => {
+        if (v.length > 0){
+        const {rowCount, rows} = await postsRepository.searchHashtag(v)
+
         if (rowCount > 0) {
           await postsRepository.insertHashtagPosts(rows[0].id, postId);
         } else {
           const hashId = await postsRepository.insertHashtag(v);
           await postsRepository.insertHashtagPosts(hashId.rows[0].id, postId);
         }
-      });
+      }});
     }
 
     res.sendStatus(200);
