@@ -69,7 +69,7 @@ async function loginUser({
 }
 async function getUser(id) {
     const result = await connection.query(`
-        SELECT username
+        SELECT username, picture_url
         FROM users
         WHERE id=$1`,[id]);
 
@@ -83,6 +83,16 @@ async function searchUser(text){
 
     return users;
 }
+async function insertFollower(follower_id, followed_id){
+    connection.query(
+        `INSERT INTO follows (follower_id, followed_id) VALUES ($1,$2)`, 
+    [follower_id, followed_id]);
+}
+async function removeFollower(follower_id, followed_id){
+    connection.query(
+        `DELETE FROM follows WHERE follower_id=$1 AND followed_id=$2`, 
+    [follower_id, followed_id]);
+}
 
 export {
     create,
@@ -93,4 +103,6 @@ export {
     loginUser,
     searchUser,
     getUser,
+    insertFollower,
+    removeFollower,
 }
