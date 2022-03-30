@@ -33,8 +33,6 @@ CREATE TABLE "posts" (
   OIDS=FALSE
 );
 
-
-
 CREATE TABLE "likes" (
 	"id" serial NOT NULL,
 	"user_id" integer NOT NULL,
@@ -77,8 +75,6 @@ CREATE TABLE "links" (
 ) WITH (
   OIDS=FALSE
 );
-
-
 
 CREATE TABLE "follows" (
 	"id" serial NOT NULL,

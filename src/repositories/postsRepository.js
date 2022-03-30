@@ -25,7 +25,7 @@ async function read() {
     posts.id DESC
   LIMIT
     20`);
-  
+
   return posts;
 }
 
@@ -42,7 +42,8 @@ async function findById({ postId }) {//se mexer nessa função avisar o time
 }
 
 async function findPostLikes({ postId }) {
-  const { rows: posts } = await connection.query(`
+  const { rows: posts } = await connection.query(
+    `
   SELECT
     posts.id,
     posts.comment,
@@ -66,8 +67,10 @@ async function findPostLikes({ postId }) {
   ORDER BY
     posts.id DESC
   LIMIT
-    20;`, [postId]);
-  
+    20;`,
+    [postId]
+  );
+
   return posts;
 }
 

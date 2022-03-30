@@ -19,7 +19,8 @@ export async function deleteRepost(userId, postId) {
 
 export async function getReposts(postId){
   const result = await connection.query(`
-    SELECT * FROM reposts
+    SELECT r.*, u.username FROM reposts r
+    LEFT JOIN users u ON r.user_id = u.id
     WHERE post_id=$1
     `, [postId])
   return result
