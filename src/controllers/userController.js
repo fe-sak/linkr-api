@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt'
 import * as userRepository from '../repositories/userRepository.js';
 import { generateToken } from '../utils/generateToken.js';
 import printError from '../utils/printError.js';
+import isGoodId from '../utils/checkId.js';
 
 async function signUp(req, res, next) {
     const {
@@ -97,15 +98,23 @@ async function logout(req, res, next) {
 }
 
 async function getById(req, res) {
-    const id = req.params.id;
+    const { id } = req.params;
+    const { userId } = res.locals.user;
     try {
         if (!Number.isInteger(parseInt(id)) || id < 0) {
             return res.status(404).send('invalid id');
         }
 
         const result = await userRepository.getUser(id);
-
-        res.send(result.rows[0])
+        const followed = await userRepository.findFollowedById(userId, id);
+        let isFollowed = false;
+        if(followed > 0){
+            isFollowed = true;
+        } 
+        res.send({
+            ...result.rows[0],
+            isFollowed
+        });
 
     } catch (error) {
         printError(res, error)
@@ -113,10 +122,13 @@ async function getById(req, res) {
 }
 
 async function getUsers(req, res){
-    const { text } = req.query;
+    const { text, id } = req.query;
     try{
         if(text.length>=3){
-            const list = await userRepository.searchUser(text);
+            if(!isGoodId(id)){
+                return res.status(404).send('invalid id')
+            }
+            const list = await userRepository.searchUser(text, id);
             res.status(200).send(list);
             return;
         }
@@ -126,10 +138,34 @@ async function getUsers(req, res){
     }
 }
 
+async function followUser(req,res){
+    const { userId } = res.locals.user;
+    const { followedId } = req.body;
+    try {
+        await userRepository.insertFollower(userId, followedId);
+        res.sendStatus(200);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+async function unfollowUser(req,res){
+    const { userId } = res.locals.user;
+    const { followedId } = req.body;
+    try {
+        await userRepository.removeFollower(userId, followedId);
+        res.sendStatus(200);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
+
 export {
     signUp,
     login,
     logout,
     getUsers,
     getById,
+    followUser,
+    unfollowUser
 }
