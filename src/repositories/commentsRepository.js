@@ -1,5 +1,24 @@
 import connection from '../database.js';
 
+async function read(postId) {
+  return await connection.query(
+    `
+    SELECT
+      comments.id AS "commentId",
+      comments.text,
+      users.id AS "userId",
+      users.username,
+      users.picture_url AS "userPic"
+    FROM
+      comments
+      JOIN users ON comments.user_id = users.id
+    WHERE
+      post_id = $1
+  `,
+    [postId]
+  );
+}
+
 async function create(userId, postId, textValue) {
   return await connection.query(
     `
@@ -12,4 +31,4 @@ async function create(userId, postId, textValue) {
   );
 }
 
-export { create };
+export { read, create };
