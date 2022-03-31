@@ -75,11 +75,13 @@ async function getUser(id) {
 
     return result
 }
-async function searchUser(text){
+async function searchUser(text, userId) {
     const { rows: users } = await connection.query(`
-        SELECT id, username, picture_url FROM users
-        WHERE UPPER(username) LIKE UPPER($1);
-    `, [`${text}%`]);
+        SELECT u.id, username, picture_url FROM users u
+        LEFT JOIN follows ON followed_id=u.id AND follower_id=$2
+        WHERE UPPER(username) LIKE UPPER($1)
+        ORDER BY followed_id;
+    `, [`${text}%`, userId]);
 
     return users;
 }
