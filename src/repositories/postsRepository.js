@@ -1,6 +1,6 @@
 import connection from '../database.js';
 
-async function read() {
+async function read(userId) {
   const { rows: posts } = await connection.query(`
   SELECT
     posts.id,
@@ -19,12 +19,13 @@ async function read() {
     posts
     JOIN users "usersP" ON posts.user_id = "usersP".id
     JOIN links ON posts.link_id = links.id
+    JOIN follows f ON (posts.user_id=f.followed_id AND f.follower_id=$1)
     LEFT JOIN likes ON posts.id = likes.post_id
     LEFT JOIN users "usersL" ON likes.user_id="usersL".id
   ORDER BY
     posts.id DESC
   LIMIT
-    20`);
+    20`, [userId]);
 
   return posts;
 }

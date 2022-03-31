@@ -61,8 +61,9 @@ export async function postPosts(req, res) {
 }
 
 export async function readPosts(req, res, next) {
+  const { userId } = res.locals.user;
   try {
-    const posts = await postsRepository.read();
+    const posts = await postsRepository.read(userId);
     return res.send(posts);
   } catch (error) {
     next(error);
