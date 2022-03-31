@@ -84,14 +84,21 @@ async function searchUser(text){
     return users;
 }
 async function insertFollower(follower_id, followed_id){
-    connection.query(
+    await connection.query(
         `INSERT INTO follows (follower_id, followed_id) VALUES ($1,$2)`, 
     [follower_id, followed_id]);
 }
 async function removeFollower(follower_id, followed_id){
-    connection.query(
+    await connection.query(
         `DELETE FROM follows WHERE follower_id=$1 AND followed_id=$2`, 
     [follower_id, followed_id]);
+}
+async function findFollowedById(follower_id, followed_id){
+    const {rowCount: userFollowed } = await connection.query(
+        `SELECT * FROM follows WHERE follower_id=$1 AND followed_id=$2`, 
+    [follower_id, followed_id]);
+
+    return userFollowed;
 }
 
 export {
@@ -105,4 +112,5 @@ export {
     getUser,
     insertFollower,
     removeFollower,
+    findFollowedById,
 }
