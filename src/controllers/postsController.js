@@ -1,6 +1,7 @@
 import printError from '../utils/printError.js';
 import * as postsRepository from '../repositories/postsRepository.js';
-import createLinkSnippet from "../utils/createLinkSnippet.js";
+import createLinkSnippet from '../utils/createLinkSnippet.js';
+import isGoodId from '../utils/checkId.js';
 
 export async function postPosts(req, res) {
   try {
@@ -69,24 +70,23 @@ export async function readPosts(req, res, next) {
   }
 }
 
-
-export async function getHashtag(req,res){
-    try {
-        const hashtags = await postsRepository.hashtagTrending();
-        res.status(200).send(hashtags);
-    } catch (err) {
-        res.status(500).send(err); 
-    }
+export async function getHashtag(req, res) {
+  try {
+    const hashtags = await postsRepository.hashtagTrending();
+    res.status(200).send(hashtags);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 }
 
-export async function postByHashtag(req, res){
-    const { hashtag } = req.params;
-    try{
-        const posts = await postsRepository.getPostByHashtag(hashtag);
-        res.status(200).send(posts);
-    } catch (err) {
-        res.status(500).send(err);
-    }
+export async function postByHashtag(req, res) {
+  const { hashtag } = req.params;
+  try {
+    const posts = await postsRepository.getPostByHashtag(hashtag);
+    res.status(200).send(posts);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 }
 export async function deletePost(req, res, next) {
   const { postId } = req.params;
@@ -102,7 +102,8 @@ export async function getById(req, res) {
   const id = req.params.id;
   const { olderThan } = req.query;
   try {
-    if (!Number.isInteger(parseInt(id)) || id < 0) {
+    
+    if (!isGoodId(id)) {
       return res.status(404).send('invalid id');
     }
 
@@ -111,31 +112,32 @@ export async function getById(req, res) {
     res.send(result)
     
   } catch (error) {
-    printError(res, error)
+    printError(res, error);
   }
 }
-export async function updatePost(req, res){
-  const { comment, id : postId } = req.body;
-  try{
-    await postsRepository.updateComment(comment, postId, res.locals.user.userId);
+
+export async function updatePost(req, res) {
+  const { comment, id: postId } = req.body;
+  try {
+    await postsRepository.updateComment(
+      comment,
+      postId,
+      res.locals.user.userId
+    );
     await postsRepository.deleteHashtagPostItem(postId);
+
     if (comment){
       const arr = comment.split(' ')
       const tags = arr.filter(v => v[0] === '#').map(v => v.substr(1).trim())
       tags.map(async v => {
         if (v.length > 0){
         const {rowCount, rows} = await postsRepository.searchHashtag(v)
+
         if (rowCount > 0) {
-          await postsRepository.insertHashtagPosts(
-            rows[0].id,
-            postId
-          );
+          await postsRepository.insertHashtagPosts(rows[0].id, postId);
         } else {
           const hashId = await postsRepository.insertHashtag(v);
-          await postsRepository.insertHashtagPosts(
-          hashId.rows[0].id,
-          postId
-          );
+          await postsRepository.insertHashtagPosts(hashId.rows[0].id, postId);
         }
       }});
     }
@@ -145,5 +147,4 @@ export async function updatePost(req, res){
     res.status(500).send(err);
     console.log(err);
   }
-  
 }
