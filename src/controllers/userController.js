@@ -62,13 +62,14 @@ async function login(req, res, next) {
 
         await userRepository.deleteSession({ userId: user.id })
 
-        await userRepository.loginUser({
+        const id = await userRepository.loginUser({
             token,
             userId: user.id
         });
 
         return res.send({
             token,
+            userId: user.id,
             username: user.username,
             pictureUrl: user.picture_url,
         });
