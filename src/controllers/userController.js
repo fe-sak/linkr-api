@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt'
 import * as userRepository from '../repositories/userRepository.js';
 import { generateToken } from '../utils/generateToken.js';
 import printError from '../utils/printError.js';
+import isGoodId from '../utils/checkId.js';
 
 async function signUp(req, res, next) {
     const {
@@ -113,10 +114,13 @@ async function getById(req, res) {
 }
 
 async function getUsers(req, res){
-    const { text } = req.query;
+    const { text, id } = req.query;
     try{
         if(text.length>=3){
-            const list = await userRepository.searchUser(text);
+            if(!isGoodId(id)){
+                return res.status(404).send('invalid id')
+            }
+            const list = await userRepository.searchUser(text, id);
             res.status(200).send(list);
             return;
         }
