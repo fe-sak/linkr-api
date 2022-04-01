@@ -37,12 +37,15 @@ async function read({ olderThan, userId }) {
   `
   
   if (olderThan) {
+    console.log(olderThan);
     query += ` OFFSET $2`;
     dependencies.push(olderThan);
   }
 
 
   const { rows: posts } = await connection.query(`${ query } LIMIT 10;`, dependencies);
+
+  // console.log(posts);
   
   return posts;
 }
@@ -271,13 +274,20 @@ async function deleteHashtagPostItem(id) {
   await connection.query(`DELETE FROM hashtags_posts WHERE post_id=$1`, [id]);
 }
 
-async function readCurrentPostsQuantity() {
+async function readCurrentPostsQuantity({ userId }) {
   const posts = await connection.query(`
-      SELECT
-        COUNT(id) AS count
-      FROM posts;
+    SELECT 
+      COUNT(posts.id) AS count
+    FROM posts
+    JOIN reposts r
+      ON r.user_id in (select followed_id
+    from follows where follower_id = 7)
+    WHERE 
+      posts.user_id in (select followed_id from follows where follower_id = 7)
+      OR posts.id = r.post_id
+      GROUP BY posts.id;
     `);
-  return posts.rows[0];
+  return posts.rows.length;
 }
 
 export {
@@ -298,3 +308,4 @@ export {
   findPostLikes,
   readCurrentPostsQuantity,
 };
+

@@ -153,10 +153,11 @@ export async function updatePost(req, res) {
 }
 
 export async function checkPostsQuantity(req, res, next) {
+  const id = res.locals.user.userId;
   try {
-    const quantity = await postsRepository.readCurrentPostsQuantity();
+    const count = await postsRepository.readCurrentPostsQuantity({ userId: id });
   
-    return res.send(quantity);
+    return res.status(200).send({count});
   } catch (error) {
     next(error);
   }
