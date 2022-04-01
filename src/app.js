@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import router from './routes/index.js';
+import * as postsController from './controllers/postsController.js';
 
 const app = express();
 

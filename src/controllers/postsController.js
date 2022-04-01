@@ -62,8 +62,10 @@ export async function postPosts(req, res) {
 
 export async function readPosts(req, res, next) {
   const { olderThan } = req.query;
+  
   try {
     const posts = await postsRepository.read({ olderThan });
+
     return res.send(posts);
   } catch (error) {
     next(error);
@@ -81,8 +83,9 @@ export async function getHashtag(req, res) {
 
 export async function postByHashtag(req, res) {
   const { hashtag } = req.params;
+  const { olderThan } = req.query;
   try {
-    const posts = await postsRepository.getPostByHashtag(hashtag);
+    const posts = await postsRepository.getPostByHashtag({ name: hashtag, olderThan });
     res.status(200).send(posts);
   } catch (err) {
     res.status(500).send(err);
@@ -145,6 +148,16 @@ export async function updatePost(req, res) {
     res.sendStatus(200);
   } catch (err) {
     res.status(500).send(err);
-    console.log(err);
+    console.error();
+  }
+}
+
+export async function checkPostsQuantity(req, res, next) {
+  try {
+    const quantity = await postsRepository.readCurrentPostsQuantity();
+  
+    return res.send(quantity);
+  } catch (error) {
+    next(error);
   }
 }

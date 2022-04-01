@@ -7,6 +7,7 @@ async function read({ olderThan }) {
     posts.id,
     posts.comment,
     posts.user_id AS "userId",
+    posts.timestamp,
     "usersP".username,
     "usersP".picture_url AS "userPic",
     links.title AS "linkTitle",
@@ -15,15 +16,24 @@ async function read({ olderThan }) {
     links.url AS url,
     likeS.id AS "likeId",
     likes.user_id AS "likeUserId",
-    "usersL".username AS "likeUsername"
+    "usersL".username AS "likeUsername",
+    case
+     when posts.id in (select post_id from reposts where user_id in (select followed_id from follows where follower_id = 7))
+    then
+     (select timestamp from reposts where user_id in (select followed_id from follows where follower_id = 7) and posts.id = post_id) 
+    else
+     posts.timestamp
+    end AS e
   FROM
     posts
     JOIN users "usersP" ON posts.user_id = "usersP".id
     JOIN links ON posts.link_id = links.id
     LEFT JOIN likes ON posts.id = likes.post_id
     LEFT JOIN users "usersL" ON likes.user_id="usersL".id
+    LEFT JOIN reposts r ON r.user_id in (select followed_id from follows where follower_id = 7)
+    WHERE posts.user_id in (select followed_id from follows where follower_id = 7) OR posts.id = r.post_id
   ORDER BY
-    posts.id DESC
+    e DESC
   `
   
   if (olderThan) {
@@ -212,38 +222,40 @@ async function getPostByUser({ id, olderThan }) {
   return result.rows;
 }
 
-async function getPostByHashtag(name) {
-  const { rows: posts } = await connection.query(
-    `
-      SELECT
-        posts.id,
-        posts.comment,
-        posts.user_id AS "userId",
-        usersP.username,
-        usersP.picture_url AS "userPic",
-        links.title AS "linkTitle",
-        links.image AS "linkImage",
-        links.description AS "linkDescription",
-        links.url AS url,
-        likeS.id AS "likeId",
-        likes.user_id AS "likeUserId",
-        usersL.username AS "likeUsername"
-      FROM
-        posts
-        JOIN users usersP ON posts.user_id = usersP.id
-        JOIN links ON posts.link_id = links.id
-        LEFT JOIN likes ON posts.id = likes.post_id
-        LEFT JOIN users usersL ON likes.user_id=usersL.id
-        JOIN hashtags_posts hp ON posts.id=hp.post_id
-        JOIN hashtags h ON hp.hashtag_id=h.id
-      WHERE h.name=$1
-      ORDER BY
-        posts.id DESC
-      LIMIT
-        20
-      `,
-    [name]
-  );
+async function getPostByHashtag({ name, olderThan }) {
+  const dependencies = [name];
+  let query = `
+    SELECT
+      posts.id,
+      posts.comment,
+      posts.user_id AS "userId",
+      usersP.username,
+      usersP.picture_url AS "userPic",
+      links.title AS "linkTitle",
+      links.image AS "linkImage",
+      links.description AS "linkDescription",
+      links.url AS url,
+      likeS.id AS "likeId",
+      likes.user_id AS "likeUserId",
+      usersL.username AS "likeUsername"
+    FROM
+      posts
+      JOIN users usersP ON posts.user_id = usersP.id
+      JOIN links ON posts.link_id = links.id
+      LEFT JOIN likes ON posts.id = likes.post_id
+      LEFT JOIN users usersL ON likes.user_id=usersL.id
+      JOIN hashtags_posts hp ON posts.id=hp.post_id
+      JOIN hashtags h ON hp.hashtag_id=h.id
+    WHERE h.name=$1
+    ORDER BY
+      posts.id DESC`;
+
+  if (olderThan) {
+    query += ` OFFSET $2`;
+    dependencies.push(olderThan);
+  }
+
+  const { rows: posts } = await connection.query(`${ query } LIMIT 10;`, dependencies);
   return posts;
 }
 
@@ -256,6 +268,15 @@ async function updateComment(comment, postId, userId) {
 
 async function deleteHashtagPostItem(id) {
   await connection.query(`DELETE FROM hashtags_posts WHERE post_id=$1`, [id]);
+}
+
+async function readCurrentPostsQuantity() {
+  const posts = await connection.query(`
+      SELECT
+        COUNT(id) AS count
+      FROM posts;
+    `);
+  return posts.rows[0];
 }
 
 export {
@@ -274,4 +295,5 @@ export {
   deleteById,
   getPostByUser,
   findPostLikes,
+  readCurrentPostsQuantity,
 };

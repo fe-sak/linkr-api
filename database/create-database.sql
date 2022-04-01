@@ -27,7 +27,7 @@ CREATE TABLE "posts" (
 	"comment" TEXT,
 	"user_id" integer NOT NULL,
 	"link_id" integer NOT NULL,
-	"timestamp" TIMESTAMP NOT NULL DEFAULT 'NOW()',
+	"timestamp" TIMESTAMP NOT NULL DEFAULT NOW(),
 	CONSTRAINT "posts_pk" PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
@@ -67,7 +67,7 @@ CREATE TABLE "hashtags_posts" (
 
 CREATE TABLE "links" (
 	"id" serial NOT NULL,
-	"title" TEXT NOT NULL,
+	"title" TEXT,
 	"image" TEXT,
 	"description" TEXT,
 	"url" TEXT NOT NULL UNIQUE,
@@ -103,7 +103,7 @@ CREATE TABLE "reposts" (
 	"id" serial NOT NULL,
 	"post_id" integer NOT NULL,
 	"user_id" integer NOT NULL,
-	"timestamp" TIMESTAMP NOT NULL DEFAULT 'NOW()',
+	"timestamp" TIMESTAMP NOT NULL DEFAULT NOW(),
 	CONSTRAINT "reposts_pk" PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
