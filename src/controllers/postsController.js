@@ -61,11 +61,11 @@ export async function postPosts(req, res) {
 }
 
 export async function readPosts(req, res, next) {
+  const { userId } = res.locals.user;
   const { olderThan } = req.query;
   
   try {
-    const posts = await postsRepository.read({ olderThan });
-
+    const posts = await postsRepository.read({ olderThan, userId });
     return res.send(posts);
   } catch (error) {
     next(error);

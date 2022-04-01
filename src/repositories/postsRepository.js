@@ -1,7 +1,7 @@
 import connection from '../database.js';
 
-async function read({ olderThan }) {
-  const dependencies = [];
+async function read({ olderThan, userId }) {
+  const dependencies = [userId];
   let query = `
   SELECT
     posts.id,
@@ -18,9 +18,9 @@ async function read({ olderThan }) {
     likes.user_id AS "likeUserId",
     "usersL".username AS "likeUsername",
     case
-     when posts.id in (select post_id from reposts where user_id in (select followed_id from follows where follower_id = 7))
+     when posts.id in (select post_id from reposts where user_id in (select followed_id from follows where follower_id = $1))
     then
-     (select timestamp from reposts where user_id in (select followed_id from follows where follower_id = 7) and posts.id = post_id) 
+     (select timestamp from reposts where user_id in (select followed_id from follows where follower_id = $1) and posts.id = post_id) 
     else
      posts.timestamp
     end AS e
@@ -30,16 +30,17 @@ async function read({ olderThan }) {
     JOIN links ON posts.link_id = links.id
     LEFT JOIN likes ON posts.id = likes.post_id
     LEFT JOIN users "usersL" ON likes.user_id="usersL".id
-    LEFT JOIN reposts r ON r.user_id in (select followed_id from follows where follower_id = 7)
-    WHERE posts.user_id in (select followed_id from follows where follower_id = 7) OR posts.id = r.post_id
+    LEFT JOIN reposts r ON r.user_id in (select followed_id from follows where follower_id = $1)
+    WHERE posts.user_id in (select followed_id from follows where follower_id = $1) OR posts.id = r.post_id
   ORDER BY
     e DESC
   `
   
   if (olderThan) {
-    query += ` OFFSET $1`;
+    query += ` OFFSET $2`;
     dependencies.push(olderThan);
   }
+
 
   const { rows: posts } = await connection.query(`${ query } LIMIT 10;`, dependencies);
   

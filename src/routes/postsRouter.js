@@ -15,7 +15,7 @@ import { auth } from '../middlewares/authMiddleware.js';
 
 const postsRouter = Router();
 
-postsRouter.get('/posts', readPosts);
+postsRouter.get('/posts', auth, readPosts);
 postsRouter.get('/posts/quantity', checkPostsQuantity);
 postsRouter.get('/posts/:id', getById)
 
