@@ -16,14 +16,7 @@ async function read({ olderThan, userId }) {
     links.url AS url,
     likeS.id AS "likeId",
     likes.user_id AS "likeUserId",
-    "usersL".username AS "likeUsername",
-    case
-     when posts.id in (select post_id from reposts where user_id in (select followed_id from follows where follower_id = $1))
-    then
-     (select timestamp from reposts where user_id in (select followed_id from follows where follower_id = $1) and posts.id = post_id) 
-    else
-     posts.timestamp
-    end AS e
+    "usersL".username AS "likeUsername"
   FROM
     posts
     JOIN users "usersP" ON posts.user_id = "usersP".id
@@ -32,25 +25,20 @@ async function read({ olderThan, userId }) {
     LEFT JOIN users "usersL" ON likes.user_id="usersL".id
     LEFT JOIN reposts r ON r.user_id in (select followed_id from follows where follower_id = $1)
     WHERE posts.user_id in (select followed_id from follows where follower_id = $1) OR posts.id = r.post_id
-  ORDER BY
-    e DESC
+    ORDER BY posts.id DESC
   `
   
   if (olderThan) {
-    console.log(olderThan);
     query += ` OFFSET $2`;
     dependencies.push(olderThan);
   }
 
 
-  const { rows: posts } = await connection.query(`${ query } LIMIT 10;`, dependencies);
-
-  // console.log(posts);
-  
+  const { rows: posts } = await connection.query(`${ query }`, dependencies);
   return posts;
 }
 
-async function findById({ postId }) {//se mexer nessa função avisar o time
+async function findById({ postId }) {
   const post = await connection.query(
     `
       SELECT * FROM posts
@@ -211,8 +199,9 @@ async function getPostByUser({ id, olderThan }) {
       JOIN links ON posts.link_id = links.id
       LEFT JOIN likes ON posts.id = likes.post_id
       LEFT JOIN users usersL ON likes.user_id=usersL.id
-    WHERE
-      usersP.id=$1
+      
+    LEFT JOIN reposts r ON r.user_id = $1
+    WHERE posts.user_id = $1 OR posts.id = r.post_id
     ORDER BY
       posts.id DESC`
 
@@ -221,7 +210,7 @@ async function getPostByUser({ id, olderThan }) {
     dependencies.push(olderThan);
   }
 
-  const result = await connection.query(`${ query } LIMIT 10;`, dependencies);
+  const result = await connection.query(`${ query } `, dependencies);
 
   return result.rows;
 }
@@ -277,16 +266,17 @@ async function deleteHashtagPostItem(id) {
 async function readCurrentPostsQuantity({ userId }) {
   const posts = await connection.query(`
     SELECT 
-      COUNT(posts.id) AS count
+      posts.id
     FROM posts
     JOIN reposts r
       ON r.user_id in (select followed_id
-    from follows where follower_id = 7)
+    from follows where follower_id = $1)
     WHERE 
-      posts.user_id in (select followed_id from follows where follower_id = 7)
+      posts.user_id in (select followed_id from follows where follower_id = $1)
       OR posts.id = r.post_id
-      GROUP BY posts.id;
-    `);
+      group by posts.id
+      
+    `, [userId]);
   return posts.rows.length;
 }
 
