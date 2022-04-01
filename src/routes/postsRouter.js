@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+  checkPostsQuantity,
   deletePost,
   getById,
   getHashtag,
@@ -15,6 +16,7 @@ import { auth } from '../middlewares/authMiddleware.js';
 const postsRouter = Router();
 
 postsRouter.get('/posts', auth, readPosts);
+postsRouter.get('/posts/quantity', auth, checkPostsQuantity);
 postsRouter.get('/posts/:id', getById)
 
 postsRouter.post(
@@ -23,7 +25,6 @@ postsRouter.post(
   auth,
   postPosts
 );
-
 
 postsRouter.delete('/posts/:postId', auth, deletePost);
 
