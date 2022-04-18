@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
-  createComment,
-  readCommentsByPostId,
+    createComment,
+    readCommentsByPostId,
 } from '../controllers/commentsController.js';
 import { auth } from '../middlewares/authMiddleware.js';
 import { validatePostId } from '../middlewares/validatePostIdMiddleware.js';
@@ -9,16 +9,16 @@ import { validatePostId } from '../middlewares/validatePostIdMiddleware.js';
 const commentsRouter = Router();
 
 commentsRouter.get(
-  '/posts/:postId/comments',
-  validatePostId,
-  readCommentsByPostId
+    '/posts/:postId/comments',
+    validatePostId,
+    readCommentsByPostId,
 );
 
 commentsRouter.post(
-  '/posts/:postId/comments',
-  auth,
-  validatePostId,
-  createComment
+    '/posts/:postId/comments',
+    auth,
+    validatePostId,
+    createComment,
 );
 
 export default commentsRouter;
