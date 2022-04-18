@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import router from './routes/index.js';
-import * as postsController from './controllers/postsController.js';
 
 const app = express();
 
@@ -12,5 +11,5 @@ app.use(cors());
 app.use(router);
 
 app.listen(process.env.PORT, () => {
-  console.log(`Server listening on port ${process.env.PORT}`);
+    console.log(`Server listening on port ${process.env.PORT}`);
 });

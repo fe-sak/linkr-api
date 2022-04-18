@@ -77,7 +77,11 @@ async function getUser(id) {
 }
 async function searchUser(text, userId) {
     const { rows: users } = await connection.query(`
-        SELECT u.id, username, picture_url FROM users u
+        SELECT 
+            u.id,
+            username,
+            picture_url
+        FROM users u
         LEFT JOIN follows ON followed_id=u.id AND follower_id=$2
         WHERE UPPER(username) LIKE UPPER($1)
         ORDER BY followed_id;
@@ -85,20 +89,26 @@ async function searchUser(text, userId) {
 
     return users;
 }
-async function insertFollower(follower_id, followed_id) {
+async function insertFollower(followerId, followedId) {
     await connection.query(
-        `INSERT INTO follows (follower_id, followed_id) VALUES ($1,$2)`, 
-    [follower_id, followed_id]);
+        'INSERT INTO follows (follower_id, followed_id) VALUES ($1,$2)',
+        [followerId, followedId],
+    );
 }
-async function removeFollower(follower_id, followed_id){
+async function removeFollower(followerId, followedId) {
     await connection.query(
-        `DELETE FROM follows WHERE follower_id=$1 AND followed_id=$2`, 
-    [follower_id, followed_id]);
+        `DELETE FROM follows
+        WHERE follower_id=$1 AND followed_id=$2`,
+        [followerId, followedId],
+    );
 }
-async function findFollowedById(follower_id, followed_id){
-    const {rowCount: userFollowed } = await connection.query(
-        `SELECT * FROM follows WHERE follower_id=$1 AND followed_id=$2`, 
-    [follower_id, followed_id]);
+async function findFollowedById(followerId, followedId) {
+    const { rowCount: userFollowed } = await connection.query(
+        `SELECT *
+        FROM follows
+        WHERE follower_id=$1 AND followed_id=$2`,
+        [followerId, followedId],
+    );
 
     return userFollowed;
 }
@@ -115,4 +125,4 @@ export {
     insertFollower,
     removeFollower,
     findFollowedById,
-}
+};

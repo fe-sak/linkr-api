@@ -30,7 +30,6 @@
         "radix": [
             "error",
             "as-needed"
-        ],
-        "eslint camelcase": ["error", {"properties": "never"}]
+        ]
     }
 }
