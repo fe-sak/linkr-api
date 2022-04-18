@@ -146,6 +146,7 @@ export async function updatePost(req, res) {
 
         return res.sendStatus(200);
     } catch (err) {
+        // eslint-disable-next-line no-console
         console.log(err);
         return res.status(500).send(err);
     }

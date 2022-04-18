@@ -11,5 +11,6 @@ app.use(cors());
 app.use(router);
 
 app.listen(process.env.PORT, () => {
+    // eslint-disable-next-line no-console
     console.log(`Server listening on port ${process.env.PORT}`);
 });
