@@ -1,0 +1,36 @@
+{
+    "env": {
+        "es2021": true,
+        "node": true,
+        "jest": true
+    },
+    "extends": [
+        "airbnb-base"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 12,
+        "sourceType": "module"
+    },
+    "rules": {
+        "import/prefer-default-export": "off",
+        "import/extensions": [
+            "error",
+            {
+                "js": "ignorePackages"
+            }
+        ],
+        "indent": [
+            "error",
+            4
+        ],
+        "no-underscore-dangle": [
+            "off"
+        ],
+        "linebreak-style": 0,
+        "radix": [
+            "error",
+            "as-needed"
+        ],
+        "eslint camelcase": ["error", {"properties": "never"}]
+    }
+}

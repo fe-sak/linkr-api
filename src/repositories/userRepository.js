@@ -1,4 +1,4 @@
-import connection from '../database.js'
+import connection from '../database.js';
 
 async function create({
     email,
@@ -71,9 +71,9 @@ async function getUser(id) {
     const result = await connection.query(`
         SELECT username, picture_url
         FROM users
-        WHERE id=$1`,[id]);
+        WHERE id=$1`, [id]);
 
-    return result
+    return result;
 }
 async function searchUser(text, userId) {
     const { rows: users } = await connection.query(`
@@ -85,7 +85,7 @@ async function searchUser(text, userId) {
 
     return users;
 }
-async function insertFollower(follower_id, followed_id){
+async function insertFollower(follower_id, followed_id) {
     await connection.query(
         `INSERT INTO follows (follower_id, followed_id) VALUES ($1,$2)`, 
     [follower_id, followed_id]);

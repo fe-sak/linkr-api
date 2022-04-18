@@ -6,6 +6,7 @@ import {
   getHashtag,
   postByHashtag,
   postPosts,
+  readExplorePosts,
   readPosts,
   updatePost,
 } from '../controllers/postsController.js';
@@ -16,6 +17,7 @@ import { auth } from '../middlewares/authMiddleware.js';
 const postsRouter = Router();
 
 postsRouter.get('/posts', auth, readPosts);
+postsRouter.get('/posts/explore', auth, readExplorePosts);
 postsRouter.get('/posts/quantity', auth, checkPostsQuantity);
 postsRouter.get('/posts/:id', getById)
 

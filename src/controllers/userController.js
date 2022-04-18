@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt';
 import * as userRepository from '../repositories/userRepository.js';
 import { generateToken } from '../utils/generateToken.js';
 import printError from '../utils/printError.js';
@@ -32,7 +32,7 @@ async function signUp(req, res, next) {
             password: hashedPassword,
             username,
             pictureUrl,
-        })
+        });
 
         return res.send(user);
     } catch (error) {
@@ -61,11 +61,11 @@ async function login(req, res, next) {
 
         const token = generateToken({ userId: user.id });
 
-        await userRepository.deleteSession({ userId: user.id })
+        await userRepository.deleteSession({ userId: user.id });
 
-        const id = await userRepository.loginUser({
+        await userRepository.loginUser({
             token,
-            userId: user.id
+            userId: user.id,
         });
 
         return res.send({
@@ -89,7 +89,7 @@ async function logout(req, res, next) {
             return res.status(404).send('User not found');
         }
 
-        await userRepository.deleteSession({ userId })
+        await userRepository.deleteSession({ userId });
 
         return res.sendStatus(204);
     } catch (error) {
@@ -108,57 +108,57 @@ async function getById(req, res) {
         const result = await userRepository.getUser(id);
         const followed = await userRepository.findFollowedById(userId, id);
         let isFollowed = false;
-        if(followed > 0){
-            isFollowed = true;
-        } 
-        res.send({
-            ...result.rows[0],
-            isFollowed
-        });
 
+        if (followed > 0) {
+            isFollowed = true;
+        }
+
+        return res.send({
+            ...result.rows[0],
+            isFollowed,
+        });
     } catch (error) {
-        printError(res, error)
+        return printError(res, error);
     }
 }
 
-async function getUsers(req, res){
+async function getUsers(req, res) {
     const { text, id } = req.query;
-    try{
-        if(text.length>=3){
-            if(!isGoodId(id)){
-                return res.status(404).send('invalid id')
+    try {
+        if (text.length >= 3) {
+            if (!isGoodId(id)) {
+                return res.status(404).send('invalid id');
             }
             const list = await userRepository.searchUser(text, id);
-            res.status(200).send(list);
-            return;
+
+            return res.status(200).send(list);
         }
-        res.status(200).send([]);        
+        return res.status(200).send([]);
     } catch (err) {
-        res.status(500).send(err);
+        return res.status(500).send(err);
     }
 }
 
-async function followUser(req,res){
+async function followUser(req, res) {
     const { userId } = res.locals.user;
     const { followedId } = req.body;
     try {
         await userRepository.insertFollower(userId, followedId);
-        res.sendStatus(200);
+        return res.sendStatus(200);
     } catch (err) {
-        res.status(500).send(err);
+        return res.status(500).send(err);
     }
 }
-async function unfollowUser(req,res){
+async function unfollowUser(req, res) {
     const { userId } = res.locals.user;
     const { followedId } = req.body;
     try {
         await userRepository.removeFollower(userId, followedId);
-        res.sendStatus(200);
+        return res.sendStatus(200);
     } catch (err) {
-        res.status(500).send(err);
+        return res.status(500).send(err);
     }
 }
-
 
 export {
     signUp,
@@ -167,5 +167,5 @@ export {
     getUsers,
     getById,
     followUser,
-    unfollowUser
-}
+    unfollowUser,
+};
