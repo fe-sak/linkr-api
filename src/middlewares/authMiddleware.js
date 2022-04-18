@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 function auth(req, res, next) {
     const token = req.headers.authorization?.replace('Bearer ', '');
-console.log(token);
+
     let userId = null;
 
     if (!token) {
