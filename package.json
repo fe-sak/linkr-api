@@ -20,7 +20,7 @@
     "express": "^4.17.3",
     "image-url-validator": "^1.0.4",
     "joi": "^17.6.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "pg": "^8.7.3",
     "url-metadata": "^2.5.0"
   },
